@@ -3,7 +3,10 @@ import cv2
 import math
 
 #distance between two cameras in m
-a = 0.6
+B = 0.6
+
+#focal length of the cameras
+f = 705.025
 
 #read images
 left = cv2.imread('test1.jpg')
@@ -52,6 +55,7 @@ for j in contours2:
 	if (cv2.contourArea(lc2) > cv2.contourArea(j)):
 		lc2 = j
 
+#Find bounding rectangle parameters for the largest contour
 rect1 = cv2.minAreaRect(lc1)
 rect2 = cv2.minAreaRect(lc2)
 
@@ -60,6 +64,7 @@ center1x = int(rect1[0][0])
 center1y = int(rect1[0][1])
 center2x = int(rect2[0][0])
 center2y = int(rect2[0][1])
+
 #origin
 originx = int(resized1.shape[1]/2)
 originy = int(resized1.shape[0])
@@ -72,23 +77,12 @@ cv2.line(resized2, (originx,originy), (originx, 0), (0,0,255), 3)
 cv2.line(resized1, (originx,originy), (center1x, center1y), (0,0,0), 3)
 cv2.line(resized2, (originx,originy), (center2x, center2y), (0,0,0), 3)
 
-#finding angles theta1 and theta 2 
-#theta = arctan((y2-y1)/(x2-x1))
+#stereo calculation
+disp = abs(center1x-center2x)
+z = (B*f)/disp
 
-slope1 = abs((center1y-originy)/(center1x-originx))
-slope2 = abs((center2y-originy)/(center2x-originx))
 
-theta1 = np.arctan(slope1)
-theta2 = np.arctan(slope2)
-print (theta1, theta2)
-#Calculations from geometry
-
-theta3 = 3.14-theta1-theta2
-b = (a/(math.sin(theta3)))*(math.sin(theta1))
-d = b*math.sin(theta2)
-
-print(theta1, theta2)
-print(theta3, a, b, d)
+print(z)
 
 cv2.imshow('testimg 1', resized1)
 cv2.imshow('testimg 2', resized2)
